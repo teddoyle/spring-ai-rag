@@ -2,7 +2,6 @@ package guru.springframework.springairag.service;
 
 import guru.springframework.springairag.model.Answer;
 import guru.springframework.springairag.model.Question;
-//import guru.springframework.springaiintro.services.OpenAIService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -22,20 +21,15 @@ import java.util.Map;
 @Service
 public class SpringAiRagServiceImpl implements SpringAiRagService {
 
-  //  public SpringAiRagServiceImpl(ChatModel chatModel, SimpleVectorStore vectorStore) {
-  //      this.chatModel = chatModel;
-  //     this.vectorStore = vectorStore;
-  //  }
-
     final SimpleVectorStore vectorStore;
     final ChatModel chatModel;
 
     // private final OpenAiService openAiService;
-    @Value("classpath:/templates/rag-prompt-template.st")
+    @Value("classpath:/templates/rag-prompt-template-meta.st")
     private Resource ragPromptTemplate;
     public Answer sendQuestion(Question question) {
         List<Document> documents = vectorStore.similaritySearch(
-                SearchRequest.query(question.question()).withTopK(8) );
+                SearchRequest.query(question.question()).withTopK(4) );
         List<String> contentList = documents.stream().map(Document::getContent).toList();
 
         PromptTemplate promptTemplate = new PromptTemplate(ragPromptTemplate);
@@ -46,6 +40,5 @@ public class SpringAiRagServiceImpl implements SpringAiRagService {
 
         ChatResponse response = chatModel.call(chatPrompt);
         return new Answer(response.getResult().getOutput().getContent());
-        // return new Answer("I do not know");
     }
 }
